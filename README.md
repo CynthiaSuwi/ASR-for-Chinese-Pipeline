@@ -27,7 +27,7 @@ The aim of this project is to develop a working Speech to Text module for the Re
 ## Exporting model and Testing
 ## Running Code at CWRU HPC
 ## Acknowledgments
-* [Google Summer of Code 2017](https://summerofcode.withgoogle.com/)
+* [Google Summer of Code 2018](https://summerofcode.withgoogle.com/)
 * [Red Hen Lab](http://www.redhenlab.org/)
 * [DeepSpeech2 on PaddlePaddle](https://github.com/PaddlePaddle/DeepSpeech)
 * [DeepSpeech2 Paper](http://proceedings.mlr.press/v48/amodei16.pdf)
