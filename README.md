@@ -9,7 +9,7 @@ Based on these, I make a slight change for my future tasks:
 2. Use the model in DeepSpeech2 to test its word error rate and study on its usability.
 3. Script using Shell and Python to make the workflow better fit in Red Hen's pipeline.
 
-#### Contents
+## Contents
 
 1. [Getting Started](#getting-started)
 2. [Data-Preprocessing for Training](#data-preprocessing-for-training)
