@@ -16,7 +16,7 @@ Based on these, I make a slight change for my future tasks:
 3. [Training](#training)
 4. [Checkpointing](#checkpointing)
 5. [Some Training Results](#some-training-results)
-6. [Exporting model and Testing](#exporting-model-and-testing)
+6. [ASR system based on PaddlePaddle and Kaldi](#ASR system based on PaddlePaddle and Kaldi)
 7. [Running Code at CWRU HPC](#running-code-at-cwru-hpc)
 8. [Acknowledgments](#acknowledgments)
 
@@ -122,7 +122,8 @@ wget -O zhidao_giga.klm http://cloud.dlnel.org/filepub/?uuid=245d02bb-cd01-4ebe-
 
 ## CheckPointing
 ## Some Training Results
-## Exporting model and Testing
+## ASR system based on PaddlePaddle and Kaldi
+
 ## Running Code at CWRU HPC
 1. Login
 ```
