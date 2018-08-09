@@ -2,12 +2,7 @@
 
 This is my [Google Summer of Code 2018 Project](https://summerofcode.withgoogle.com/projects/#5284664500027392) with the [Red Hen Lab](http://www.redhenlab.org/).
 
-The aim of this project is to develop a working Speech-to-Text module for the Red Hen Lab’s Chinese Pipeline, resulting in a working application. The initial goal is to establish a Tensorflow implementation for Chinese speech recognition based on [Mozilla's DeepSpeech](https://github.com/mozilla/DeepSpeech). During the GSoC coding period, we've found a better option for Chinese ASR: an open source program named [DeepSpeech2 on PaddlePaddle](https://github.com/PaddlePaddle/DeepSpeech) based on [DeepSpeech2 Paper](http://proceedings.mlr.press/v48/amodei16.pdf), which better suit Chinese Pipeline rather than Mozilla’s DeepSpeech. Until the end of the 4th week in GSoC, I have progressed to the point of being able to run DeepSpeech2 on PaddlePaddle inside Singularity on CWRU HPC and already had a perfect model developed by Baidu with its abundant Chinese materials.
-
-Based on these, I make a slight change for my future tasks:
-1. Fully understand the code and model framework provided by Baidu.
-2. Use the model in DeepSpeech2 to test its word error rate and study on its usability.
-3. Script using Shell and Python to make the workflow better fit in Red Hen's pipeline.
+The aim of this project is to develop a working Speech-to-Text module for the Red Hen Lab’s Chinese Pipeline, resulting in a working application. The initial goal is to establish a Tensorflow implementation for Chinese speech recognition based on [Mozilla's DeepSpeech](https://github.com/mozilla/DeepSpeech). During the GSoC coding period, we've found a better option for Chinese ASR: an open source program named [DeepSpeech2 on PaddlePaddle](https://github.com/PaddlePaddle/DeepSpeech) based on [DeepSpeech2 Paper](http://proceedings.mlr.press/v48/amodei16.pdf), which better suit Chinese Pipeline rather than Mozilla’s DeepSpeech. Until the end of in GSoC, I have progressed to the point of being able to run DeepSpeech2 on PaddlePaddle inside Singularity on CWRU HPC and already had a perfect model developed by Baidu with its abundant Chinese materials. I also established an ASR system based on PaddlePaddle and Kaldi. Different from direct prediction of word distribution using deep learning end-to-end model in DeepSpeech, the example in this blog is closer to the traditional ASR process. I tried to use phoneme as the modeling unit, focusing on the training of the acoustic model in ASR,using Kaldi to extract the features of the audio data and the label alignment, and integrate the decoder of the Kaldi to complete the decoding.
 
 ## Contents
 
@@ -125,11 +120,15 @@ wget -O zhidao_giga.klm http://cloud.dlnel.org/filepub/?uuid=245d02bb-cd01-4ebe-
 ## ASR system based on PaddlePaddle and Kaldi
 
 ## Running Code at CWRU HPC
-1. Login
+1. Login and open screen
 ```
-$ ssh sxx186@redhen1.case.edu
-$ ssh sxx186@rider.case.edu
+ssh sxx186@redhen1.case.edu
+screen
+ssh sxx186@rider.case.edu
+srun -p gpu -C gpuk40 --mem= 32gb --gres=gpu:2 --pty bash
+module load singularity/2.5.1
 ```
+- Note: Using screen enable you to 
 
 2. Require a computation node and load Singularity
 ```
