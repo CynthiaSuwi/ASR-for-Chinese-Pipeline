@@ -35,6 +35,12 @@ $ singularity pull shub://RedHenLab/singularity_containers:DeepSpeech2_shuwei
 $ git clone https://github.com/CynthiaSuwi/ASR-for-Chinese-Pipeline.git
 ```
 
+3. Download 70GB language model
+```
+$ cd models/lm
+$ wget -O zhidao_giga.klm http://cloud.dlnel.org/filepub/?uuid=245d02bb-cd01-4ebe-b079-b97be864ec37
+```
+
 ## Data-Preprocessing for Training
 
 ### Generate Manifest
