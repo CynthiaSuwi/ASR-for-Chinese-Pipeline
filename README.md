@@ -45,16 +45,19 @@ $ wget -O zhidao_giga.klm http://cloud.dlnel.org/filepub/?uuid=245d02bb-cd01-4eb
 
 ### Generate Manifest
 
-*DeepSpeech2 on PaddlePaddle* accepts a textual **manifest** file as its data set interface. A manifest file summarizes a set of speech data, with each line containing some meta data (e.g. filepath, transcription, duration) of one audio clip, in [JSON](http://www.json.org/) format, such as:
+*ASR for Chinese Pipeline on PaddlePaddle* accepts a textual **manifest** file as its data set interface. A manifest file summarizes a set of speech data, with each line containing some meta data (e.g. filepath, transcription, duration) of one audio clip, in [JSON](http://www.json.org/) format, such as:
 
 ```
-{"audio_filepath": "/home/work/.cache/paddle/Libri/134686/1089-134686-0001.flac", "duration": 3.275, "text": "stuff it into you his belly counselled him"}
-{"audio_filepath": "/home/work/.cache/paddle/Libri/134686/1089-134686-0007.flac", "duration": 4.275, "text": "a cold lucid indifference reigned in his soul"}
+{"audio_filepath": "/mnt/rds/redhen/gallina/Singularity/DeepSpeech2/DeepSpeech/.cache/paddle/dataset/speech/Aishell/data_aishell/wav/dev/S0724/BAC009S0724W0123.wav", "duration": 3.241, "text": "相比于其他一线城市"}
+{"audio_filepath": "/mnt/rds/redhen/gallina/Singularity/DeepSpeech2/DeepSpeech/.cache/paddle/dataset/speech/Aishell/data_aishell/wav/dev/S0724/BAC009S0724W0466.wav", "duration": 4.910875, "text": "故宫博物院官网发布公告称"}
+{"audio_filepath": "/mnt/rds/redhen/gallina/Singularity/DeepSpeech2/DeepSpeech/.cache/paddle/dataset/speech/Aishell/data_aishell/wav/dev/S0724/BAC009S0724W0310.wav", "duration": 10.9819375, "text": "还应该主动融入中国制造二万一千零二十五规划中的新产业"}
+{"audio_filepath": "/mnt/rds/redhen/gallina/Singularity/DeepSpeech2/DeepSpeech/.cache/paddle/dataset/speech/Aishell/data_aishell/wav/dev/S0724/BAC009S0724W0189.wav", "duration": 4.913, "text": "若公诉罪名利用未公开信息交易罪成立"}
+{"audio_filepath": "/mnt/rds/redhen/gallina/Singularity/DeepSpeech2/DeepSpeech/.cache/paddle/dataset/speech/Aishell/data_aishell/wav/dev/S0724/BAC009S0724W0158.wav", "duration": 5.216, "text": "对单价三万元的二手房承接力不断反升"}
 ```
 
 To use your custom data, you only need to generate such manifest files to summarize the dataset. Given such summarized manifests, training, inference and all other modules can be aware of where to access the audio files, as well as their meta data including the transcription labels.
 
-For how to generate such manifest files, please refer to `data/librispeech/librispeech.py`, which will download data and generate manifest files for LibriSpeech dataset.
+For how to generate such manifest files, please refer to `data/aishell/aishell.py`, which will download data and generate manifest files for Aishell dataset.
 
 ### Compute Mean & Stddev for Normalizer
 
@@ -62,13 +65,13 @@ To perform z-score normalization (zero-mean, unit stddev) upon audio features, w
 
 ```bash
 python tools/compute_mean_std.py \
---num_samples 2000 \
---specgram_type linear \
---manifest_paths data/librispeech/manifest.train \
---output_path data/librispeech/mean_std.npz
+--manifest_path='data/aishell/manifest.train' \
+--num_samples=2000 \
+--specgram_type='linear' \
+--output_path='data/aishell/mean_std.npz'
 ```
 
-It will compute the mean and standard deviation of power spectrum feature with 2000 random sampled audio clips listed in `data/librispeech/manifest.train` and save the results to `data/librispeech/mean_std.npz` for further usage.
+It will compute the mean and standard deviation of power spectrum feature with 2000 random sampled audio clips listed in `data/aishell/manifest.train` and save the results to `data/aishell/mean_std.npz` for further usage.
 
 
 ### Build Vocabulary
@@ -77,19 +80,19 @@ A vocabulary of possible characters is required to convert the transcription int
 
 ```bash
 python tools/build_vocab.py \
---count_threshold 0 \
---vocab_path data/librispeech/eng_vocab.txt \
---manifest_paths data/librispeech/manifest.train
+--count_threshold=0 \
+--vocab_path='data/aishell/vocab.txt' \
+--manifest_paths 'data/aishell/manifest.train' 'data/aishell/manifest.dev'
 ```
 
-It will write a vocabuary file `data/librispeeech/eng_vocab.txt` with all transcription text in `data/librispeech/manifest.train`, without vocabulary truncation (`--count_threshold 0`).
+It will write a vocabuary file `data/aishell/vocab.txt` with all transcription text in `data/aishell/manifest.train`, without vocabulary truncation (`--count_threshold 0`).
 
 ### More Help
 
 For more help on arguments:
 
 ```bash
-python data/librispeech/librispeech.py --help
+python data/aishell/aishell.py --help
 python tools/compute_mean_std.py --help
 python tools/build_vocab.py --help
 ```
