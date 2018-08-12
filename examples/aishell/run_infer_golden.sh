@@ -2,7 +2,7 @@
 
 cd ../.. > /dev/null
 
-# download language model
+# download language model(We skip this part since we already have 70GB model)
 #cd models/lm > /dev/null
 #sh download_lm_ch.sh
 #if [ $? -ne 0 ]; then
@@ -41,7 +41,7 @@ python -u infer.py \
 --mean_std_path='models/aishell/mean_std.npz' \
 --vocab_path='models/aishell/vocab.txt' \
 --model_path='models/aishell/params.tar.gz' \
---lang_model_path='models/lm/zh_giga.no_cna_cmn.prune01244.klm' \
+--lang_model_path='models/lm/zhidao_giga.klm' \
 --decoding_method='ctc_beam_search' \
 --error_rate_type='cer' \
 --specgram_type='linear'
