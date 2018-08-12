@@ -10,9 +10,9 @@ The aim of this project is to develop a working Speech-to-Text module for the Re
 2. [Data-Preprocessing for Training](#data-preprocessing-for-training)
 3. [Training](#training)
 4. [Inference and Evaluation](#inference-and-evaluation)
-5. [Some Training Results](#some-training-results)
-6. [ASR system based on PaddlePaddle and Kaldi](#asr-system-based-on-paddlepaddle-and-kaldi)
-7. [Running Code at CWRU HPC](#running-code-at-cwru-hpc)
+5. [Running Code at CWRU HPC](#running-code-at-cwru-hpc)
+6. [Some Training Results](#some-training-results)
+7. [ASR system based on PaddlePaddle and Kaldi](#asr-system-based-on-paddlepaddle-and-kaldi)
 8. [Acknowledgments](#acknowledgments)
 
 ## Getting Started
@@ -43,7 +43,7 @@ $ wget -O zhidao_giga.klm http://cloud.dlnel.org/filepub/?uuid=245d02bb-cd01-4eb
 
 ## Data-Preprocessing for Training
 
-### Generate Manifest
+### 1. Generate Manifest
 
 *ASR for Chinese Pipeline on PaddlePaddle* accepts a textual **manifest** file as its data set interface. A manifest file summarizes a set of speech data, with each line containing some meta data (e.g. filepath, transcription, duration) of one audio clip, in [JSON](http://www.json.org/) format, such as:
 
@@ -59,7 +59,7 @@ To use your custom data, you only need to generate such manifest files to summar
 
 For how to generate such manifest files, please refer to `data/aishell/aishell.py`, which will download data and generate manifest files for Aishell dataset.
 
-### Compute Mean & Stddev for Normalizer
+### 2. Compute Mean & Stddev for Normalizer
 
 To perform z-score normalization (zero-mean, unit stddev) upon audio features, we have to estimate in advance the mean and standard deviation of the features, with some training samples:
 
@@ -74,7 +74,7 @@ python tools/compute_mean_std.py \
 It will compute the mean and standard deviation of power spectrum feature with 2000 random sampled audio clips listed in `data/aishell/manifest.train` and save the results to `data/aishell/mean_std.npz` for further usage.
 
 
-### Build Vocabulary
+### 3. Build Vocabulary
 
 A vocabulary of possible characters is required to convert the transcription into a list of token indices for training, and in decoding, to convert from a list of indices back to text again. Such a character-based vocabulary can be built with `tools/build_vocab.py`.
 
@@ -87,7 +87,7 @@ python tools/build_vocab.py \
 
 It will write a vocabuary file `data/aishell/vocab.txt` with all transcription text in `data/aishell/manifest.train`, without vocabulary truncation (`--count_threshold 0`).
 
-### More Help
+### 4. More Help
 
 For more help on arguments:
 
@@ -99,7 +99,7 @@ python tools/build_vocab.py --help
 
 ## Inference and Evaluation
 
-### Prepare Language Model
+### 1. Prepare Language Model
 
 Language Model | Training Data | Token-based | Size | Descriptions
 :-------------:| :------------:| :-----: | -----: | :-----------------
@@ -113,14 +113,14 @@ wget -O zhidao_giga.klm http://cloud.dlnel.org/filepub/?uuid=245d02bb-cd01-4ebe-
 
 Different from the English language model, Mandarin language model is character-based where each token is a Chinese character. We use internal corpus to train the released Mandarin language models. The corpus contain billions of tokens. Please notice that the released language models only contain Chinese simplified characters. After preprocessing done we can begin to train the language model. The key training arguments for small LM is '-o 5 --prune 0 1 2 4 4' and '-o 5' for large LM. Please refer above section for the meaning of each argument. We also convert the arpa file to binary file using default settings.
 
-### Prepare Speech Model
+### 2. Prepare Speech Model
 
 Language  | Model Name | Training Data | Hours of Speech
 :-----------: | :------------: | :----------: |  -------:
 Mandarin | [Aishell Model](http://cloud.dlnel.org/filepub/?uuid=61de63b9-6904-4809-ad95-0cc5104ab973) | [Aishell Dataset](http://www.openslr.org/33/) | 151 h
 Mandarin | [BaiduCN1.2k Model](http://cloud.dlnel.org/filepub/?uuid=499569a6-0025-4f40-83e6-1c99527431a6) | Baidu Internal Mandarin Dataset | 1204 h
 
-### Speech-to-text Inference
+### 3. Speech-to-text Inference
 
 An inference module caller `infer.py` is provided to infer, decode and visualize speech-to-text results for several given audio clips. It might help to have an intuitive and qualitative evaluation of the ASR model's performance.
 
@@ -145,7 +145,7 @@ python infer.py --help
 ```
 or refer to `example/aishell/run_infer_golden.sh`.
 
-### Evaluate a Model
+### 4. Evaluate a Model
 
 To evaluate a model's performance quantitatively, please run:
 
@@ -172,7 +172,7 @@ or refer to `example/aishell/run_test_golden.sh`.
 
 ## Running Code at CWRU HPC
 1. Login and open screen
-```
+```bash
 $ ssh sxx186@redhen1.case.edu
 $ screen
 $ ssh sxx186@rider.case.edu
@@ -180,7 +180,7 @@ $ ssh sxx186@rider.case.edu
 - Note: Screen establishes a terminal window on the server. So it doesn’t matter if your network connection is terrible or even drops.
 
 2. Require a computation node and load Singularity
-```
+```bash
 $ ssh sxx186@rider.case.edu
 $ srun -p gpu -C gpup100 --mem=180gb --gres=gpu:1 --pty bash
 $ module load singularity/2.5.1
@@ -188,7 +188,7 @@ $ module load singularity/2.5.1
 - Note: Note: remember to require larger memory, otherwise it will occur the error “srun out of memory”.
 
 3. Get into the image
-```
+```bash
 $ cd /mnt/rds/redhen/gallina/Singularity/DeepSpeech2/DeepSpeech/
 $ singularity shell --nv -e -H `pwd` deepspeech2_suwi_singularity.simg
 ```
@@ -196,7 +196,7 @@ $ singularity shell --nv -e -H `pwd` deepspeech2_suwi_singularity.simg
 - Note 2: there’s no need to UNSET HOME anymore, since I created a Singularity recipe to set environment.
 
 4. Run the code
-```
+```bash
 $ cd examples/aishell/
 $ sh run_data.sh
 $ sh run_test_golden.sh
@@ -291,6 +291,77 @@ Current error rate [cer] = 0.066667
 - Note 3: I modified the batch_size from 128 to 64 in `run_test_golden.sh` file to meet the memory requirement of CWRU server.
 
 ## ASR system based on PaddlePaddle and Kaldi
+
+### 1. Model Overview
+The acoustic model in this example is a multi-layer stacked LSTMP structure. The structure uses convolution to extract the initial features, uses multi-layer LSTMP to model the temperal relation. The loss function is the cross entropy. LSTMP(LSTM with recurrent projection layer) is the extension of the traditional LSTM, adding a mapping layer on the basis of LSTM. The layer maps the hidden layer to a lower dimension and goes into the next time step. The structure also reduces the size and computation complexity of LSTM, at the same time improves the performance of LSTM.
+![](https://github.com/CynthiaSuwi/cynthiasuwi.github.io/blob/master/_posts/img/lstmp.png?raw=true)
+
+### 2. Installation
+
+- Kaldi
+The decoder of the example depends on Kaldi, install it by flowing its [intructions](https://github.com/kaldi-asr/kaldi).Then set the environment variable `KALDI_ROOT`:
+```bash
+$ export KALDI_ROOT=<Installation path of kaldi>
+```
+
+- Decoder
+```bash
+$ git clone https://github.com/CynthiaSuwi/ASR-for-Chinese-Pipeline.git
+$ cd kaldi/decoder
+$ sh setup.sh
+```
+
+### 3. Data Preprocessing
+Refer to the [data preparation process of Kaldi](http://kaldi-asr.org/doc/data_prep.html) to complete the feature extraction and label alignment of audio data.
+
+### 4. Demo
+This section takes the Aishell dataset as an example to show how to complete data preprocessing and decoding output. To simplify the process, the preprocessed dataset has been provided for download:
+```bash
+$ cd kaldi/examples/aishell
+$ sh prepare_data.sh
+```
+
+After the download is completed, the training process can be analyzed before starting training:
+```bash
+$ sh profile.sh
+```
+
+Execute the training:
+```bash
+$ sh train.sh
+```
+
+The cost function and the trend of accuracy in the training process are shown below:![](https://github.com/CynthiaSuwi/cynthiasuwi.github.io/blob/master/_posts/img/learning_curve.png?raw=true)
+
+After completing the model training, the text in the prediction test set can be executed:
+```bash
+$ sh infer_by_ckpt.sh
+```
+
+It includes two important processes: the prediction of acoustic model and the decoding output of the decoder. The following is a sample of the decoded output:
+```bash
+BAC009S0764W0239 十一 五 期间 我 国 累计 境外 投资 七千亿 美元
+BAC009S0765W0140 在 了解 送 方 的 资产 情况 与 需求 之后
+BAC009S0915W0291 这 对 苹果 来说 不 是 件 容易 的 事 儿
+BAC009S0769W0159 今年 土地 收入 预计 近 四万亿 元
+BAC009S0907W0451 由 浦东 商店 作为 掩护
+BAC009S0768W0128 土地 交易 可能 随着 供应 淡季 的 到来 而 降温
+```
+
+Each row corresponds to one output, beginning with the key word of the audio sample, followed by the decoding of the Chinese text separated by the word. Run script evaluation word error rate (CER) after decoding completion:
+
+```bash
+$ sh score_cer.sh
+```
+
+Its output is similar as below:
+
+```bash
+Error rate[cer] = 0.101971 (10683/104765),
+total 7176 sentences in hyp, 0 not presented in ref.
+```
+
+Using the acoustic model of 20 rounds of training, we can get about 10% CER for recognition results on the Aishell test set.
 
 ## Acknowledgments
 * [Google Summer of Code 2018](https://summerofcode.withgoogle.com/)
