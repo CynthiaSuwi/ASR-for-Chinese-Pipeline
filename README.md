@@ -292,11 +292,7 @@ Current error rate [cer] = 0.066667
 
 ## ASR system based on PaddlePaddle and Kaldi
 
-### 1. Model Overview
-The acoustic model in this example is a multi-layer stacked LSTMP structure. The structure uses convolution to extract the initial features, uses multi-layer LSTMP to model the temperal relation. The loss function is the cross entropy. LSTMP(LSTM with recurrent projection layer) is the extension of the traditional LSTM, adding a mapping layer on the basis of LSTM. The layer maps the hidden layer to a lower dimension and goes into the next time step. The structure also reduces the size and computation complexity of LSTM, at the same time improves the performance of LSTM.
-![](https://github.com/CynthiaSuwi/cynthiasuwi.github.io/blob/master/_posts/img/lstmp.png?raw=true)
-
-### 2. Installation
+### 1. Installation
 
 - Kaldi
 The decoder of the example depends on Kaldi, install it by flowing its [intructions](https://github.com/kaldi-asr/kaldi).Then set the environment variable `KALDI_ROOT`:
@@ -311,10 +307,10 @@ $ cd kaldi/decoder
 $ sh setup.sh
 ```
 
-### 3. Data Preprocessing
+### 2. Data Preprocessing
 Refer to the [data preparation process of Kaldi](http://kaldi-asr.org/doc/data_prep.html) to complete the feature extraction and label alignment of audio data.
 
-### 4. Demo
+### 3. Demo
 This section takes the Aishell dataset as an example to show how to complete data preprocessing and decoding output. To simplify the process, the preprocessed dataset has been provided for download:
 ```bash
 $ cd kaldi/examples/aishell
