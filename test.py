@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 add_arg = functools.partial(add_arguments, argparser=parser)
 # yapf: disable
 add_arg('batch_size',       int,    128,    "Minibatch size.")
-add_arg('trainer_count',    int,    8,      "# of Trainers (CPUs or GPUs).")
+add_arg('trainer_count',    int,    1,      "# of Trainers (CPUs or GPUs).")
 add_arg('beam_size',        int,    500,    "Beam search width.")
 add_arg('num_proc_bsearch', int,    8,      "# of CPUs for beam search.")
 add_arg('num_proc_data',    int,    8,      "# of CPUs for data preprocessing.")
@@ -44,7 +44,7 @@ add_arg('model_path',       str,
         "If None, the training starts from scratch, "
         "otherwise, it resumes from the pre-trained model.")
 add_arg('lang_model_path',  str,
-        'models/lm/common_crawl_00.prune01111.trie.klm',
+        'models/lm/zhidao_giga.klm',
         "Filepath for language model.")
 add_arg('decoding_method',  str,
         'ctc_beam_search',
@@ -108,6 +108,10 @@ def evaluate():
         else:
             result_transcripts = ds2_model.decode_batch_beam_search(
                 probs_split=probs_split,
+                vocab_list=vocab_list)
+        else:
+            result_transcripts = ds2_model.decode_batch_beam_search(
+                probs_split=probs_split,
                 beam_alpha=args.alpha,
                 beam_beta=args.beta,
                 beam_size=args.beam_size,
@@ -135,7 +139,6 @@ def main():
                 rnn_use_batch=True,
                 trainer_count=args.trainer_count)
     evaluate()
-
 
 if __name__ == '__main__':
     main()
