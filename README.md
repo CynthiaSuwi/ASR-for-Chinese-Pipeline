@@ -20,35 +20,20 @@ The aim of this project is to develop a working Speech-to-Text module for the Re
 ### Prerequisites
 
 - Python 2.7 only supported
-- PaddlePaddle the latest version
+- [Singularity](http://singularity.lbl.gov/user-guide)
+
 
 ### Installation
 
-1. You can use pip to install PaddlePaddle with a single command. But there are many little problems during installation and cost me a lot of time to fix(See the following Notes for detail).
-
+1. Download Singularity Image
 ```
-sudo pip install paddlepaddle
-```
-- Note 1: Make sure that your default python version Python 2.7 series.
-- Note 2: pip only supports manylinux1 standard, you’ll need to upgrade your pip to >9.0.0.
-- Note 3: Use sudo pip instead or you’ll get permission denied error.
-
-2. Make sure these libraries or tools installed: pkg-config, flac, ogg, vorbis, boost and swig,(I installed them via homebrew with proxy):
-```
-brew install pkg-config
-brew install flac
-brew install vorbis-tools
-brew install boost
-brew install swig
+$ singularity pull shub://RedHenLab/singularity_containers:DeepSpeech2_shuwei
 ```
 
-3. Run the setup script for the remaining dependencies.
+2. Cloning the repository
 ```
-git clone https://github.com/PaddlePaddle/DeepSpeech.git
-cd DeepSpeech
-sudo sh setup.sh
+$ git clone https://github.com/CynthiaSuwi/ASR-for-Chinese-Pipeline.git
 ```
-- Note : Remember to use “sudo” and using “brew install gcc” to install Fortran compiler.
 
 ## Data-Preprocessing for Training
 
