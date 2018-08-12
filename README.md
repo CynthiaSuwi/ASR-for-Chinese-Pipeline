@@ -9,9 +9,9 @@ The aim of this project is to develop a working Speech-to-Text module for the Re
 1. [Getting Started](#getting-started)
 2. [Data-Preprocessing for Training](#data-preprocessing-for-training)
 3. [Training](#training)
-4. [Checkpointing](#checkpointing)
+4. [Inference and Evaluation](#inference-and-evaluation)
 5. [Some Training Results](#some-training-results)
-6. [ASR system based on PaddlePaddle and Kaldi](#ASR system based on PaddlePaddle and Kaldi)
+6. [ASR system based on PaddlePaddle and Kaldi](#asr-system-based-on-paddlepaddle-and-kaldi)
 7. [Running Code at CWRU HPC](#running-code-at-cwru-hpc)
 8. [Acknowledgments](#acknowledgments)
 
@@ -97,7 +97,9 @@ python tools/compute_mean_std.py --help
 python tools/build_vocab.py --help
 ```
 
-## Training
+## Inference and Evaluation
+
+### Prepare Language Model
 
 Language Model | Training Data | Token-based | Size | Descriptions
 :-------------:| :------------:| :-----: | -----: | :-----------------
@@ -109,9 +111,64 @@ In this project, we download the 70.4 GB model using:
 wget -O zhidao_giga.klm http://cloud.dlnel.org/filepub/?uuid=245d02bb-cd01-4ebe-b079-b97be864ec37
 ```
 
-## CheckPointing
-## Some Training Results
-## ASR system based on PaddlePaddle and Kaldi
+Different from the English language model, Mandarin language model is character-based where each token is a Chinese character. We use internal corpus to train the released Mandarin language models. The corpus contain billions of tokens. Please notice that the released language models only contain Chinese simplified characters. After preprocessing done we can begin to train the language model. The key training arguments for small LM is '-o 5 --prune 0 1 2 4 4' and '-o 5' for large LM. Please refer above section for the meaning of each argument. We also convert the arpa file to binary file using default settings.
+
+### Prepare Speech Model
+
+Language  | Model Name | Training Data | Hours of Speech
+:-----------: | :------------: | :----------: |  -------:
+Mandarin | [Aishell Model](http://cloud.dlnel.org/filepub/?uuid=61de63b9-6904-4809-ad95-0cc5104ab973) | [Aishell Dataset](http://www.openslr.org/33/) | 151 h
+Mandarin | [BaiduCN1.2k Model](http://cloud.dlnel.org/filepub/?uuid=499569a6-0025-4f40-83e6-1c99527431a6) | Baidu Internal Mandarin Dataset | 1204 h
+
+### Speech-to-text Inference
+
+An inference module caller `infer.py` is provided to infer, decode and visualize speech-to-text results for several given audio clips. It might help to have an intuitive and qualitative evaluation of the ASR model's performance.
+
+- Inference with GPU:
+
+    ```bash
+    CUDA_VISIBLE_DEVICES=0 python infer.py --trainer_count 1
+    ```
+
+- Inference with CPUs:
+
+    ```bash
+    python infer.py --use_gpu False --trainer_count 12
+    ```
+
+We provide two types of CTC decoders: *CTC greedy decoder* and *CTC beam search decoder*. The *CTC greedy decoder* is an implementation of the simple best-path decoding algorithm, selecting at each timestep the most likely token, thus being greedy and locally optimal. The [*CTC beam search decoder*](https://arxiv.org/abs/1408.2873) otherwise utilizes a heuristic breadth-first graph search for reaching a near global optimality; it also requires a pre-trained KenLM language model for better scoring and ranking. The decoder type can be set with argument `--decoding_method`.
+
+For more help on arguments:
+
+```
+python infer.py --help
+```
+or refer to `example/aishell/run_infer_golden.sh`.
+
+### Evaluate a Model
+
+To evaluate a model's performance quantitatively, please run:
+
+- Evaluation with GPUs:
+
+    ```bash
+    CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python test.py --trainer_count 8
+    ```
+
+- Evaluation with CPUs:
+
+    ```bash
+    python test.py --use_gpu False --trainer_count 12
+    ```
+
+The error rate (default: word error rate; can be set with `--error_rate_type`) will be printed.
+
+For more help on arguments:
+
+```bash
+python test.py --help
+```
+or refer to `example/aishell/run_test_golden.sh`.
 
 ## Running Code at CWRU HPC
 1. Login and open screen
@@ -145,7 +202,10 @@ $ sh run_data.sh
 $ sh run_test_golden.sh
 $ sh run_infer_golden.sh
 ```
-5. Results
+
+
+## Some Training Results
+
 ```
 -----------  Configuration Arguments -----------
 alpha: 2.6
@@ -229,6 +289,8 @@ Current error rate [cer] = 0.066667
 - Note 1: I modified the `run_infer_golden.sh` file to change lm model as larger 70GB model. And skip the repeating download step to realize quicker execution.
 - Note 2: I modified the `infer.py` file to make the target transcription support UTF-8 Chinese by adding .encode(utf-8).
 - Note 3: I modified the batch_size from 128 to 64 in `run_test_golden.sh` file to meet the memory requirement of CWRU server.
+
+## ASR system based on PaddlePaddle and Kaldi
 
 ## Acknowledgments
 * [Google Summer of Code 2018](https://summerofcode.withgoogle.com/)
