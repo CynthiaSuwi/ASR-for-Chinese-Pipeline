@@ -2,29 +2,29 @@
 
 cd ../.. > /dev/null
 
-# download language model
-cd models/lm > /dev/null
-sh download_lm_ch.sh
-if [ $? -ne 0 ]; then
-    exit 1
-fi
-cd - > /dev/null
+# download language model(We skip this part since we already have 70GB language model)
+# cd models/lm > /dev/null
+# sh download_lm_ch.sh
+# if [ $? -ne 0 ]; then
+#     exit 1
+# fi
+# cd - > /dev/null
 
 
-# download well-trained model
-cd models/aishell > /dev/null
-sh download_model.sh
-if [ $? -ne 0 ]; then
-    exit 1
-fi
-cd - > /dev/null
+# download well-trained model(We skip this part since we have done this pari in run_golden_infer)
+# cd models/aishell > /dev/null
+# sh download_model.sh
+# if [ $? -ne 0 ]; then
+#     exit 1
+# fi
+# cd - > /dev/null
 
 
 # evaluate model
-CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 \
+CUDA_VISIBLE_DEVICES=0 \
 python -u test.py \
---batch_size=128 \
---trainer_count=8 \
+--batch_size=64 \
+--trainer_count=1 \
 --beam_size=300 \
 --num_proc_bsearch=8 \
 --num_proc_data=8 \
@@ -42,7 +42,7 @@ python -u test.py \
 --mean_std_path='models/aishell/mean_std.npz' \
 --vocab_path='models/aishell/vocab.txt' \
 --model_path='models/aishell/params.tar.gz' \
---lang_model_path='models/lm/zh_giga.no_cna_cmn.prune01244.klm' \
+--lang_model_path='models/lm/zhidao_giga.klm' \
 --decoding_method='ctc_beam_search' \
 --error_rate_type='cer' \
 --specgram_type='linear'
